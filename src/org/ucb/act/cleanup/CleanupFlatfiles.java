@@ -125,7 +125,7 @@ public class CleanupFlatfiles {
                 Molecule amol = MolImporter.importMol(inchi);
                 amol.getBondCount();
             } catch(Exception err) {
-                dudChemWriter.write(id + "\t" + chemIdToInchi.get(id) + "\t" + chemIdToName.get(id) + "\n");
+                dudChemWriter.write(id + "\t" + chemIdToName.get(id) + "\t" + chemIdToSmiles.get(id) + "\t" + chemIdToInchi.get(id)+ "\n");
                 throw err;
             }
             validatedChems.add(id);
