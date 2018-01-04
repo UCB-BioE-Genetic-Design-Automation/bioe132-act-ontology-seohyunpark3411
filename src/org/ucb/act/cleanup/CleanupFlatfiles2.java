@@ -36,7 +36,7 @@ public class CleanupFlatfiles2 {
         dudRxnWriter = new FileWriter(file1);
         dudRxnWriter.write("rxnid\tecnum\tsubstrates\tproducts\n");
         
-        File file2 = new File("good_reactions2.txt");
+        File file2 = new File("metacyc_reactions.txt");
         goodRxnWriter = new FileWriter(file2);
         goodRxnWriter.write("rxnid\tecnum\tsubstrates\tproducts\n");
         
@@ -91,7 +91,7 @@ public class CleanupFlatfiles2 {
         dudChemWriter.close();
         
         //for each validated chemical, write it to file
-        File cfile = new File("good_chems2.txt");
+        File cfile = new File("metacyc_chemicals.txt");
         Writer chemFilewriter = new FileWriter(cfile);
         chemFilewriter.write("id\tname\tinchi\n");
                 
