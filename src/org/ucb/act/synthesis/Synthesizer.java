@@ -15,7 +15,7 @@ import org.ucb.act.utils.FileUtils;
 public class Synthesizer {
     //Holds all the reactions and chemicals
     private final List<Reaction> reactions = new ArrayList<>();
-    private Map<Long, String> chemIdToInchi = new HashMap<>();
+    private final Map<Long, String> chemIdToInchi = new HashMap<>();
     
     //Variables for holding state of the expansion
     private int currshell = 0;
