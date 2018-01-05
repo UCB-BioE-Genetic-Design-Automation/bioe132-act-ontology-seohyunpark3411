@@ -175,6 +175,15 @@ public class Synthesizer {
         return isExpanded;
     }
     
+    public void printReachables() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        for(Long chemid : chemicalToShell.keySet()) {
+            String inchi = chemIdToInchi.get(chemid);
+            sb.append(chemid).append("\t").append(inchi).append("\t").append(chemicalToShell.get(chemid)).append("\n");
+        }
+        FileUtils.writeFile(sb.toString(), "metacyc_L2_reachables.txt");
+    }
+    
     public static void main(String[] args) throws Exception {
         Synthesizer synth = new Synthesizer();
         
@@ -193,7 +202,7 @@ public class Synthesizer {
         while(synth.ExpandOnce()) {}
         
         //Print out the reachables and their shell
-        
+        synth.printReachables();
         
         System.out.println("done");
     }
