@@ -188,13 +188,14 @@ public class Synthesizer {
         Synthesizer synth = new Synthesizer();
         
         //Populate the chemical and reaction data
-//        synth.populateReactions("metacyc_reactions.txt");
-//        synth.populateChemicals("metacyc_chemicals.txt");
-
         synth.populateReactions("good_reactions.txt");
         synth.populateChemicals("good_chems.txt");
         
-        //Populate the bag of chemicals to consider as shell 0
+        //To use non-inchi-validated version of MetaCyc, run these instead
+//        synth.populateReactions("metacyc_reactions.txt");
+//        synth.populateChemicals("metacyc_chemicals.txt");
+        
+        //Populate the bag of chemicals to consider as shell 0 "natives"
         synth.populateNatives("minimal_metabolites.txt");
         synth.populateNatives("universal_metabolites.txt");
 

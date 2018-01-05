@@ -120,20 +120,15 @@ public class ChemAxonUtils {
     }
 
     public static void license() throws Exception {
-        String licensepath = "licenses/license_chemaxon.cxl";
+        String licensepath = "chemaxon_license/license_chemaxon.cxl";
         File afile = new File(licensepath);
         if (!afile.exists()) {
-            System.err.println("No license file, put a valid one at /licenses/license_chemaxon.cxl");
-            return;
+            System.err.println("No license file, put a valid one at /chemaxon_license/license_chemaxon.cxl");
+            throw new RuntimeException("Missing license");
         }
 
         String lics = FileUtils.readFile(licensepath);
-
-        try {
-            LicenseManager.setLicenseFile(afile.getAbsolutePath());
-        } catch (LicenseProcessingException e) {
-            e.printStackTrace();
-        }
+        LicenseManager.setLicenseFile(afile.getAbsolutePath());
     }
 
     public static RxnMolecule SmilesToRxnMolecule(String smilesRxn) {

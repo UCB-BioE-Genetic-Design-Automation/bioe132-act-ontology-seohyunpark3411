@@ -4,6 +4,8 @@ import chemaxon.formats.MolImporter;
 import chemaxon.struc.MolAtom;
 import chemaxon.struc.MolBond;
 import chemaxon.struc.Molecule;
+import java.io.File;
+import org.ucb.act.synthesis.Synthesizer;
 import org.ucb.act.utils.ChemAxonUtils;
 import org.ucb.act.utils.FileUtils;
 
@@ -23,7 +25,14 @@ import org.ucb.act.utils.FileUtils;
 public class HelloChemaxon {
 
     public static void main(String[] args) throws Exception {
-        ChemAxonUtils.license();
+        try {
+            ChemAxonUtils.license();
+        } catch(Exception err) {
+            File licensedir = new File("chemaxon_license");
+            licensedir.mkdir();
+            System.out.println("You need to add the Chemxon license file on your path. Put it in the newly-generated chemaxon_license directory.");
+            System.exit(0);
+        }
         
         StringBuilder sb = new StringBuilder();
 
@@ -46,9 +55,45 @@ public class HelloChemaxon {
         sb.append(abond.getAtom1().getSymbol()).append("\n");       //Access the atoms attached to a bond
         sb.append(abond.getAtom2().getSymbol()).append("\n");       //And the other end of the bond
         
-        //Write out an image of the chemical's structure, and the results of these calls
-        FileUtils.writeFile(sb.toString(), "hellochemaxon_output.txt");
-        ChemAxonUtils.savePNGImage(amol, "hellochemaxon_chem.png");
-        System.out.println(sb.toString());
+        try {
+            testRunSynthesizer();
+            
+            //Write out an image of the chemical's structure, and the results of these calls
+            FileUtils.writeFile(sb.toString(), "hellochemaxon_output.txt");
+            ChemAxonUtils.savePNGImage(amol, "hellochemaxon_chem.png");
+            System.out.println("Success!\nlook for hellochemaxon_output.txt");
+        } catch(Exception err) {
+            FileUtils.writeFile("", "aksjrk2j54kl254.txt");
+            System.out.println("You need to fix your build, you are probably missing files on the path.\nExamine previous error messages to see what is missing.\nTo find your path, locate the file aksjrk2j54kl254.txt which has been generated in your filesystem.");
+        }
+        
+    }
+
+    private static void testRunSynthesizer() throws Exception {
+        Synthesizer synth = new Synthesizer();
+        
+        //Populate the chemical and reaction data
+        try {
+            synth.populateReactions("good_reactions.txt");
+        } catch(Exception err) {
+            throw new RuntimeException("The file good_reactions.txt isn't on path");
+        }
+        try {
+            synth.populateChemicals("good_chems.txt");
+        } catch(Exception err) {
+            throw new RuntimeException("The file good_chems.txt isn't on path");
+        }
+        
+        //Populate the bag of chemicals to consider as shell 0 "natives"
+        try {
+            synth.populateNatives("minimal_metabolites.txt");
+        } catch(Exception err) {
+            throw new RuntimeException("The file minimal_metabolites.txt isn't on path");
+        }
+        try {
+            synth.populateNatives("universal_metabolites.txt");
+        } catch(Exception err) {
+            throw new RuntimeException("The file universal_metabolites.txt isn't on path");
+        }
     }
 }
