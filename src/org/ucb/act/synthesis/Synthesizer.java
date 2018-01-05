@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.ucb.act.synthesis.model.Reaction;
 import org.ucb.act.utils.FileUtils;
 
 /**
@@ -16,6 +17,7 @@ public class Synthesizer {
     //Holds all the reactions and chemicals
     private final List<Reaction> reactions = new ArrayList<>();
     private final Map<Long, String> chemIdToInchi = new HashMap<>();
+    private final Map<Long, String> chemIdToName = new HashMap<>();
     
     //Variables for holding state of the expansion
     private int currshell = 0;
@@ -89,9 +91,11 @@ public class Synthesizer {
             String[] tabs = aline.trim().split("\t");
             Long id = Long.parseLong(tabs[0]);
             String inchi = tabs[2];
+            String name = tabs[1];
             
             //All we need for our algorithm is the inchi, so ignore everything else
             chemIdToInchi.put(id, inchi);
+            chemIdToName.put(id, name);
         }
         
         System.out.println("done populating chemicals" );
@@ -177,12 +181,15 @@ public class Synthesizer {
     
     public void printReachables() throws Exception {
         StringBuilder sb = new StringBuilder();
+        sb.append("id\tname\tinchi\tshell\n");
         for(Long chemid : chemicalToShell.keySet()) {
             String inchi = chemIdToInchi.get(chemid);
-            sb.append(chemid).append("\t").append(inchi).append("\t").append(chemicalToShell.get(chemid)).append("\n");
+            String name = chemIdToName.get(chemid);
+            sb.append(chemid).append("\t").append(name).append("\t").append(inchi).append("\t").append(chemicalToShell.get(chemid)).append("\n");
         }
         FileUtils.writeFile(sb.toString(), "metacyc_L2_reachables.txt");
     }
+    
     
     public static void main(String[] args) throws Exception {
         Synthesizer synth = new Synthesizer();

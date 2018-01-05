@@ -1,4 +1,4 @@
-package org.ucb.act.synthesis;
+package org.ucb.act.synthesis.model;
 
 import java.util.Set;
 
