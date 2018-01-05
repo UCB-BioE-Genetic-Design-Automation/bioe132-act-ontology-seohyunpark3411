@@ -93,7 +93,7 @@ public class Synthesizer {
             String inchi = tabs[2];
             String name = tabs[1];
             
-            //All we need for our algorithm is the inchi, so ignore everything else
+            //All we need for our algorithm is the inchi and name for output
             chemIdToInchi.put(id, inchi);
             chemIdToName.put(id, name);
         }
