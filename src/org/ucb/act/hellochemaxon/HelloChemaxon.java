@@ -1,4 +1,4 @@
-package org.ucb.act.cleanup.hellochemaxon;
+package org.ucb.act.hellochemaxon;
 
 import chemaxon.formats.MolImporter;
 import chemaxon.struc.MolAtom;

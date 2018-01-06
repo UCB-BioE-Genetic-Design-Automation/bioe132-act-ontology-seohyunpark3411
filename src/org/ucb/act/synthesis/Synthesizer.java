@@ -216,8 +216,13 @@ public class Synthesizer {
             }
         }
     }
-
-    public StringBuilder printoutCascade(Chemical achem, StringBuilder sb, int indents, Set<Chemical> visited) {
+    
+    public StringBuilder printoutCascade(Chemical achem) {
+        StringBuilder sb = new StringBuilder();
+        return printoutCascadeRelay(achem, sb, 0, new HashSet<>());
+    }
+    
+    private StringBuilder printoutCascadeRelay(Chemical achem, StringBuilder sb, int indents, Set<Chemical> visited) {
         visited.add(achem);
         
         //Put in a line of id, inchi, name into the stringbuilder for this chem
@@ -240,9 +245,8 @@ public class Synthesizer {
                     continue;
                 }
                 
-                printoutCascade(child,sb, indents+1, visited);
+                printoutCascadeRelay(child,sb, indents+1, visited);
             }
-            sb.append("\n");
         }
         
         return sb;
@@ -257,7 +261,7 @@ public class Synthesizer {
         return out.trim();
     }
 
-    public void printReachables() throws Exception {
+    public void printReachables(String outpath) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("id\tname\tinchi\tshell\n");
         for (Chemical achem : chemicalToShell.keySet()) {
@@ -266,7 +270,7 @@ public class Synthesizer {
             String name = achem.getName();
             sb.append(chemId).append("\t").append(name).append("\t").append(inchi).append("\t").append(chemicalToShell.get(achem)).append("\n");
         }
-        FileUtils.writeFile(sb.toString(), "metacyc_L2_reachables.txt");
+        FileUtils.writeFile(sb.toString(), outpath);
     }
 
     public static void main(String[] args) throws Exception {
@@ -279,25 +283,23 @@ public class Synthesizer {
         //To use non-inchi-validated version of MetaCyc, run these instead
 //        synth.populateChemicals("metacyc_chemicals.txt");
 //        synth.populateReactions("metacyc_reactions.txt");
+        
         //Populate the bag of chemicals to consider as shell 0 "natives"
         synth.populateNatives("minimal_metabolites.txt");
         synth.populateNatives("universal_metabolites.txt");
 
         //Expand until exhausted
-        while (synth.ExpandOnce()) {
-        }
+        while (synth.ExpandOnce()) {}
 
         //Print out the reachables and their shell
-        synth.printReachables();
+        synth.printReachables("metacyc_L2_reachables.txt");
 
         //Calculate Cascades
         synth.calculateCascades();
         
-        //Perform the traceback and output cascades for butanol
-        StringBuilder sb = new StringBuilder();
-        Chemical achem = synth.allChemicals.get(5133);
-        StringBuilder cascade = synth.printoutCascade(achem, sb, 0, new HashSet<>());
-        
+        //Output cascade for butanol
+        Chemical butanol = synth.allChemicals.get(5133);
+        StringBuilder cascade = synth.printoutCascade(butanol);
         FileUtils.writeFile(cascade.toString(), "butanol_cascade.text");
 
         System.out.println("done");
