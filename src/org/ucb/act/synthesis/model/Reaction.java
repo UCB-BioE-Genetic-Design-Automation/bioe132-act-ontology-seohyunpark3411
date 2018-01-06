@@ -8,10 +8,10 @@ import java.util.Set;
  */
 public class Reaction {
     private final Long id;
-    private final Set<Long> substrates;
-    private final Set<Long> products;
+    private final Set<Chemical> substrates;
+    private final Set<Chemical> products;
 
-    public Reaction(Long id, Set<Long> substrates, Set<Long> products) {
+    public Reaction(Long id, Set<Chemical> substrates, Set<Chemical> products) {
         this.id = id;
         this.substrates = substrates;
         this.products = products;
@@ -21,11 +21,11 @@ public class Reaction {
         return id;
     }
 
-    public Set<Long> getSubstrates() {
+    public Set<Chemical> getSubstrates() {
         return substrates;
     }
 
-    public Set<Long> getProducts() {
+    public Set<Chemical> getProducts() {
         return products;
     }
     

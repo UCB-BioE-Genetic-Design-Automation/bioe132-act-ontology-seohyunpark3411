@@ -3,17 +3,17 @@ package org.ucb.act.synthesis;
 import java.util.HashSet;
 import java.util.Set;
 import org.ucb.act.synthesis.model.Chemical;
-import org.ucb.act.synthesis.model.Reaction2;
+import org.ucb.act.synthesis.model.Reaction;
 
 /**
  *
  * @author J. Christopher Anderson
  */
-public class Cascade4 {
+public class Cascade {
     private final Chemical product;  //This Cascade represents all routes to this chemical
-    private final Set<Reaction2> rxnsThatFormPdt= new HashSet<>();
+    private final Set<Reaction> rxnsThatFormPdt= new HashSet<>();
 
-    public Cascade4(Chemical product) {
+    public Cascade(Chemical product) {
         this.product = product;
     }
 
@@ -21,11 +21,11 @@ public class Cascade4 {
         return product;
     }
 
-    public Set<Reaction2> getRxnsThatFormPdt() {
+    public Set<Reaction> getRxnsThatFormPdt() {
         return rxnsThatFormPdt;
     }
     
-    void addReaction(Reaction2 rxn) {
+    void addReaction(Reaction rxn) {
         rxnsThatFormPdt.add(rxn);
     }
 }
