@@ -28,7 +28,6 @@ import org.ucb.act.utils.FileUtils;
 public class Synthesizer {
 
     //Holds all the reactions and chemicals
-
     private final List<Reaction> allReactions = new ArrayList<>();
     private final List<Chemical> allChemicals = new ArrayList<>();
 
