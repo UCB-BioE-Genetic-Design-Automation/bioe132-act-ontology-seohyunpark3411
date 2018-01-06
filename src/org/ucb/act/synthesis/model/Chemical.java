@@ -1,7 +1,8 @@
 package org.ucb.act.synthesis.model;
 
 /**
- *
+ * Immutable Class for describing a Chemical
+ * 
  * @author J. Christopher Anderson
  */
 public class Chemical {

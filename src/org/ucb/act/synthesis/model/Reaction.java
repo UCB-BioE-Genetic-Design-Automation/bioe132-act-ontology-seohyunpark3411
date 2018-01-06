@@ -3,7 +3,8 @@ package org.ucb.act.synthesis.model;
 import java.util.Set;
 
 /**
- *
+ * Immutable class describing a chemical reaction
+ * 
  * @author J. Christopher Anderson
  */
 public class Reaction {
@@ -28,6 +29,4 @@ public class Reaction {
     public Set<Chemical> getProducts() {
         return products;
     }
-    
-    
 }

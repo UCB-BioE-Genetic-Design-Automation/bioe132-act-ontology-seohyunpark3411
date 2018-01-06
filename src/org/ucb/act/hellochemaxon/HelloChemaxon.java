@@ -10,7 +10,7 @@ import org.ucb.act.utils.ChemAxonUtils;
 import org.ucb.act.utils.FileUtils;
 
 /**
- * Code for project: Hello ChemAxon
+ * Code for Project 1: Hello ChemAxon
  * 
  * This is a simple script that shows basic cheminformatics functions
  * of ChemAxon on a single example molecule.  Running the code outputs
@@ -18,7 +18,10 @@ import org.ucb.act.utils.FileUtils;
  * the outputs of inidividual API calls in the script.
  * 
  * To complete this assignment, get this code base build, run this class,
- * then upload the text file hellochemaxon_output.txt to bcourses.
+ * and fix any build issues until it says (amongst other things) "Success!"
+ * 
+ * Once built, change the chemical in question to benzophenone
+ * then upload the output file hellochemaxon_output.txt to bcourses.
  * 
  * @author J. Christopher Anderson
  */
@@ -56,6 +59,7 @@ public class HelloChemaxon {
         sb.append(abond.getAtom2().getSymbol()).append("\n");       //And the other end of the bond
         
         try {
+            //This is to make sure your code works for the next assignment
             testRunSynthesizer();
             
             //Write out an image of the chemical's structure, and the results of these calls
@@ -66,7 +70,6 @@ public class HelloChemaxon {
             FileUtils.writeFile("", "aksjrk2j54kl254.txt");
             System.out.println("You need to fix your build, you are probably missing files on the path.\nExamine previous error messages to see what is missing.\nTo find your path, locate the file aksjrk2j54kl254.txt which has been generated in your filesystem.");
         }
-        
     }
 
     private static void testRunSynthesizer() throws Exception {

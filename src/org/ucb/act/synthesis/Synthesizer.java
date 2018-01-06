@@ -11,7 +11,18 @@ import org.ucb.act.synthesis.model.Reaction;
 import org.ucb.act.utils.FileUtils;
 
 /**
- *
+ * Synthesizer loads biochemical reaction data from an Ontology, and computes
+ * all biosynthetically-reachable metabolites that the data implies. It also
+ * traces back the Cascades to each Reachable chemical which can be used to 
+ * exhaustively enumerate all biosynthetic strategies.
+ * 
+ * This is the 3rd generation Act Synthesizer for computing L2. It was written
+ * from first principles, and thus not necessarily consistent with the com.20n
+ * version of Act.
+ * 
+ * It operates on a bag of MetaCyc-derived data available on bcourses under
+ * a UCB academic license.
+ * 
  * @author J. Christopher Anderson
  */
 public class Synthesizer {
@@ -29,6 +40,13 @@ public class Synthesizer {
     //Variables for holding cascades
     private final Map<Chemical, Cascade> chemicalToCascade = new HashMap<>();
 
+    /**
+     * Read in all the Chemicals from file, and store them in the
+     * allChemicals list.
+     * 
+     * @param chempath
+     * @throws Exception 
+     */
     public void populateChemicals(String chempath) throws Exception {
         //Read in all the chemicals
         String chemdata = FileUtils.readFile(chempath);
@@ -54,9 +72,12 @@ public class Synthesizer {
     }
 
     /**
-     * Read in all the Reactions from file
-     *
-     * @throws Exception
+     * Read in all the Reactions, and store them in allReactions.
+     * Also involves resolving the loose-coupled chemical references
+     * (the Long chemId's) into direct pointers to Chemical objects.
+     * 
+     * @param rxnpath
+     * @throws Exception 
      */
     public void populateReactions(String rxnpath) throws Exception {
         //First index all the chemId's for the Chemicals to hard-couple
@@ -96,7 +117,6 @@ public class Synthesizer {
 
     /**
      * Helper method for populateReactions
-     *
      * Parses the serialized reference to the list of substrates or products
      *
      * @param chemidstring
@@ -114,6 +134,14 @@ public class Synthesizer {
         return out;
     }
 
+    /**
+     * Populates a list of native chemicals from a supplied file path.
+     * This can be run multiple times if there are many files of natives
+     * to consider.
+     * 
+     * @param path
+     * @throws Exception 
+     */
     public void populateNatives(String path) throws Exception {
         //Populate a HashSet to hold all native inchis
         Set<String> nativeInchis = new HashSet<>();
@@ -192,7 +220,25 @@ public class Synthesizer {
         System.out.println("Expanded shell: " + currshell + " result " + isExpanded + " with " + chemicalToShell.size() + " reachables");
         return isExpanded;
     }
+    
+    public void printReachables(String outpath) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id\tname\tinchi\tshell\n");
+        for (Chemical achem : chemicalToShell.keySet()) {
+            Long chemId = achem.getId();
+            String inchi = achem.getInchi();
+            String name = achem.getName();
+            sb.append(chemId).append("\t").append(name).append("\t").append(inchi).append("\t").append(chemicalToShell.get(achem)).append("\n");
+        }
+        FileUtils.writeFile(sb.toString(), outpath);
+    }
 
+    /**
+     * This is the traceback method that creates the links to navigate backward
+     * from each Reachable to the natives and thus trace out Cascades or Pathways.
+     * 
+     * @throws Exception 
+     */
     public void calculateCascades() throws Exception {
         //For each Reachable, put in a new Cascade
         for (Chemical achem : chemicalToShell.keySet()) {
@@ -200,11 +246,12 @@ public class Synthesizer {
             chemicalToCascade.put(achem, casc);
         }
 
-        //For each enabled reaction, log it in to cascades
+        //For each enabled Reaction, log it into the Cascade for each product
         for (Reaction rxn : reactionToShell.keySet()) {
             for (Chemical apdt : rxn.getProducts()) {
                 
-                //Do not index reactions for natives so recursion will stop at them
+                //Do not index reactions for natives because no additional 
+                //reactions are neded to make them
                 Integer shell = chemicalToShell.get(apdt);
                 if (shell == 0) {
                     continue;
@@ -216,12 +263,32 @@ public class Synthesizer {
             }
         }
     }
-    
-    public StringBuilder printoutCascade(Chemical achem) {
+
+    /**
+     * Public method to get a human-readable-ish representation of
+     * the Cascade to a specified Chemical
+     * 
+     * This is primarily here to show how the data structures for describing
+     * the Cascades are traversed.
+     * 
+     * @param achem
+     * @return 
+     */
+    public String printoutCascade(Chemical achem) {
         StringBuilder sb = new StringBuilder();
-        return printoutCascadeRelay(achem, sb, 0, new HashSet<>());
+        return printoutCascadeRelay(achem, sb, 0, new HashSet<>()).toString();
     }
     
+    /**
+     * The functional part of printoutCascade().  It is a recursive method
+     * performing a traceback search from a specified chemical to natives.
+     * 
+     * @param achem
+     * @param sb
+     * @param indents
+     * @param visited
+     * @return 
+     */
     private StringBuilder printoutCascadeRelay(Chemical achem, StringBuilder sb, int indents, Set<Chemical> visited) {
         visited.add(achem);
         
@@ -261,18 +328,6 @@ public class Synthesizer {
         return out.trim();
     }
 
-    public void printReachables(String outpath) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append("id\tname\tinchi\tshell\n");
-        for (Chemical achem : chemicalToShell.keySet()) {
-            Long chemId = achem.getId();
-            String inchi = achem.getInchi();
-            String name = achem.getName();
-            sb.append(chemId).append("\t").append(name).append("\t").append(inchi).append("\t").append(chemicalToShell.get(achem)).append("\n");
-        }
-        FileUtils.writeFile(sb.toString(), outpath);
-    }
-
     public static void main(String[] args) throws Exception {
         Synthesizer synth = new Synthesizer();
 
@@ -299,8 +354,8 @@ public class Synthesizer {
         
         //Output cascade for butanol
         Chemical butanol = synth.allChemicals.get(5133);
-        StringBuilder cascade = synth.printoutCascade(butanol);
-        FileUtils.writeFile(cascade.toString(), "butanol_cascade.text");
+        String cascade_output = synth.printoutCascade(butanol);
+        FileUtils.writeFile(cascade_output, "butanol_cascade.text");
 
         System.out.println("done");
     }
