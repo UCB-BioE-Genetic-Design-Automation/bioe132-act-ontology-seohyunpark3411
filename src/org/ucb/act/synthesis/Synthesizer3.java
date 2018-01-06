@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.ucb.act.synthesis.model.Cascade3;
 import org.ucb.act.synthesis.model.Chemical;
 import org.ucb.act.synthesis.model.Reaction2;
 import org.ucb.act.utils.FileUtils;
@@ -23,7 +24,6 @@ public class Synthesizer3 {
     private int currshell = 0;
     private final Map<Chemical, Integer> chemicalToShell = new HashMap<>();
     private final Map<Reaction2, Integer> reactionToShell = new HashMap<>();
-    
     
     public void populateChemicals(String chempath) throws Exception {
         //Read in all the chemicals
@@ -55,7 +55,7 @@ public class Synthesizer3 {
      * @throws Exception 
      */
     public void populateReactions(String rxnpath) throws Exception {
-        //First index all the chemId's for the Chemicals
+        //First index all the chemId's for the Chemicals to hard-couple
         Map<Long, Chemical> idToChem = new HashMap<>();
         for(Chemical achem : allChemicals) {
             idToChem.put(achem.getId(), achem);
@@ -110,10 +110,8 @@ public class Synthesizer3 {
         return out;
     }
     
-    
     public void populateNatives(String path) throws Exception {  
-        
-        //Populate a HashSet to hold all native E. coli inchis
+        //Populate a HashSet to hold all native inchis
         Set<String> nativeInchis = new HashSet<>();
         
         //Read the inchis from file
