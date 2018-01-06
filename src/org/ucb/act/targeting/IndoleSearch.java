@@ -42,7 +42,7 @@ public class IndoleSearch {
      * 
      * @throws Exception 
      */
-    public void initialize() throws Exception {
+    public void initiate() throws Exception {
         //Initialize ChemAxon library (requires license file on path)
         ChemAxonUtils.license();
         
@@ -51,7 +51,6 @@ public class IndoleSearch {
         searcher = new MolSearch();
         MolSearchOptions searchOptions = new MolSearchOptions(SearchConstants.SUBSTRUCTURE);
 
-        
         //Set the matching conditions in the SearchOptions
         searchOptions.setVagueBondLevel(SearchConstants.VAGUE_BOND_LEVEL4);
         //searchOptions.setExactBondMatching(false);
@@ -104,7 +103,7 @@ public class IndoleSearch {
      * @throws Exception 
      */
     private boolean analyze(String inchi) throws Exception {
-        //Import the target chemical
+        //Import the target chemical with ChemAxon
         Molecule target  = MolImporter.importMol(inchi);
        
         //Do Molsearch for indole pattern
@@ -124,7 +123,7 @@ public class IndoleSearch {
     public static void main(String[] args) throws Exception {
         //Do the search using the 20n full L2 Reachables list
         IndoleSearch search = new IndoleSearch();
-        search.initialize();
+        search.initiate();
         Set<String> hits = search.run("r-2015-10-06-new-metacyc-with-extra-cofactors.reachables.txt");
 //        Set<String> hits = search.run("metacyc_L2_reachables.txt"); //For Synthesizer-derived list
                 
