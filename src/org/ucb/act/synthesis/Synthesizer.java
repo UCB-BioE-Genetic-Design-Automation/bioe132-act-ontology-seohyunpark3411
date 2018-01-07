@@ -354,7 +354,7 @@ public class Synthesizer {
         //Output cascade for butanol
         Chemical butanol = synth.allChemicals.get(5133);
         String cascade_output = synth.printoutCascade(butanol);
-        FileUtils.writeFile(cascade_output, "butanol_cascade.text");
+        FileUtils.writeFile(cascade_output, "butanol_cascade.txt");
 
         System.out.println("done");
     }
