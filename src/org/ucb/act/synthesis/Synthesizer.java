@@ -288,7 +288,10 @@ public class Synthesizer {
      * @param visited
      * @return 
      */
-    private StringBuilder printoutCascadeRelay(Chemical achem, StringBuilder sb, int indents, Set<Chemical> visited) {
+    private StringBuilder printoutCascadeRelay(Chemical achem, 
+                                               StringBuilder sb, 
+                                               int indents, 
+                                               Set<Chemical> visited) {
         visited.add(achem);
         
         //Put in a line of id, inchi, name into the stringbuilder for this chem
