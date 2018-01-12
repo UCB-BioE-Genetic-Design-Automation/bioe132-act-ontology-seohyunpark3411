@@ -30,6 +30,10 @@ public class InstantiateGFPReporter {
         
         //Instantiate the Composition
         Composition comp = new Composition("Pbad-amil1", parts);
+        System.out.println(comp.getName());
+        for(Part apart : comp.getParts()) {
+            System.out.println(apart.getName() + " : " + apart.getSequence());
+        }
     }
 }
 
