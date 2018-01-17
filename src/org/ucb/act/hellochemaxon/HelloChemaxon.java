@@ -55,7 +55,7 @@ public class HelloChemaxon {
         sb.append(anatom.getBondCount()).append("\n");              //Number of bonds attached to an atom
         MolBond itsbond = anatom.getBond(1);                        //Retrieve specific bonds of an atom
 
-        sb.append(amol.getBondCount()).append("\n");                //Returns the total number of bonds in hte Molecule
+        sb.append(amol.getBondCount()).append("\n");                //Returns the total number of bonds in the Molecule
         MolBond abond = amol.getBond(3);                            //Retrieve the bond at index 3
         sb.append(abond.getAtom1().getSymbol()).append("\n");       //Access the atoms attached to a bond
         sb.append(abond.getAtom2().getSymbol()).append("\n");       //And the other end of the bond
