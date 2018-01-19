@@ -186,17 +186,15 @@ public class Synthesizer {
         boolean isExpanded = false;
 
         //Iterate through reactions
-        outer:
-        for (Reaction rxn : allReactions) {
+        outer: for (Reaction rxn : allReactions) {
             //If the reaction has already been put in the expansion, skip this reaction
             if (reactionToShell.containsKey(rxn)) {
-                continue;
+                continue outer;
             }
 
             //If any of the substates are not enabled, skip this reaction
             for (Chemical achem : rxn.getSubstrates()) {
-                Integer shell = chemicalToShell.get(achem);
-                if (shell == null) {
+                if(!chemicalToShell.containsKey(achem)) {
                     continue outer;
                 }
             }
