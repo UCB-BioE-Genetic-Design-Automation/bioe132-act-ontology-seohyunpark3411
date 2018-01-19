@@ -207,8 +207,7 @@ public class Synthesizer {
 
             //For each product, enable it with current shell (if it isn't already)
             for (Chemical chemid : rxn.getProducts()) {
-                Integer shell = chemicalToShell.get(chemid);
-                if (shell == null) {
+                if(!chemicalToShell.containsKey(chemid)) {
                     chemicalToShell.put(chemid, currshell);
                 }
             }
