@@ -8,7 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import org.ucb.act.synthesis.model.Chemical;
 import org.ucb.act.synthesis.model.Reaction;
+import org.ucb.act.utils.ChemAxonUtils;
 import org.ucb.act.utils.FileUtils;
+
+import static java.lang.Long.parseLong;
 
 /**
  * Synthesizer loads biochemical reaction data from an Ontology, and computes
@@ -24,6 +27,7 @@ import org.ucb.act.utils.FileUtils;
  * UCB academic license.
  *
  * @author J. Christopher Anderson
+ * @author Seohyun Park seohyunpark3411
  */
 public class Synthesizer {
 
@@ -88,7 +92,7 @@ public class Synthesizer {
         //Parse the Reactions from file and add to the arraylist
         String rxndata = FileUtils.readFile(rxnpath);
         rxndata = rxndata.replaceAll("\"", "");
-        String[] lines = rxndata.trim().split("\\r|\\r?\\n");
+        String[] lines = rxndata.trim().split("\n");
         rxndata = null; //No longer need data, clear out memory
 
         //Iterate through lines, one line has one reaction after a header line
@@ -97,20 +101,20 @@ public class Synthesizer {
             try {
                 //Pull out the data for one reaction
                 String[] tabs = aline.trim().split("\t");
-                Long id = Long.parseLong(tabs[0]);
-                String substrates = tabs[2];
-                String products = tabs[3];
+                //Long id = parseLong(tabs[0]);
+                String name = tabs[0];
+                String substrates = tabs[1];
+                String products = tabs[2];
                 Set<Chemical> subs = handleChemIdList(substrates, idToChem);
                 Set<Chemical> pdts = handleChemIdList(products, idToChem);
 
                 //Instantiate the reaction, then add it
-                Reaction rxn = new Reaction(id, subs, pdts);
+                Reaction rxn = new Reaction(name, subs, pdts);
                 allReactions.add(rxn);
             } catch (Exception err) {
                 throw err;
             }
         }
-
         System.out.println("done populating reactions");
     }
 
@@ -124,9 +128,9 @@ public class Synthesizer {
      */
     private Set<Chemical> handleChemIdList(String chemidstring, Map<Long, Chemical> idToChem) {
         Set<Chemical> out = new HashSet<>();
-        String[] stringids = chemidstring.trim().split("\\s");
+        String[] stringids = chemidstring.trim().split("\s");
         for (int i = 0; i < stringids.length; i++) {
-            Long chemId = Long.parseLong(stringids[i]);
+            Long chemId = parseLong(stringids[i]);
             Chemical achem = idToChem.get(chemId);
             out.add(achem);
         }
@@ -140,6 +144,43 @@ public class Synthesizer {
      * @param path
      * @throws Exception
      */
+    public void populateHostNatives(String chempath) throws Exception {
+        //Read in E. coli's chemicals
+        String chemdata = FileUtils.readFile(chempath);
+        //System.out.println(chemdata);
+        chemdata = chemdata.replaceAll("\"", "");
+        String[] lines = chemdata.trim().split("\n");
+        chemdata = null;
+
+        //Each line of the file is a chemical after a header
+        for (int i = 1; i < lines.length; i++) {
+            String aline = lines[i];
+            String[] tabs = aline.trim().split("\t");
+
+            Long id = parseLong(tabs[0]);
+            String name = tabs[1];
+            String inchi = null;
+            String smiles = null;
+            if (tabs.length > 2) {
+                smiles = tabs[2];
+                inchi = ChemAxonUtils.SmilesToInchi(smiles);
+            }
+
+            boolean alreadyExists = false;
+            for (Map.Entry<Chemical, Integer> c : chemicalToShell.entrySet()) {
+                if (inchi == c.getKey().getInchi()) {
+                    alreadyExists = true;
+                }
+            }
+            if (alreadyExists == false ) {
+                Chemical achem = new Chemical(id, inchi, smiles, name);
+                chemicalToShell.put(achem, 0);
+            }
+        }
+
+        System.out.println("done populating host-specific natives: " + chempath + ", have: " + chemicalToShell.size() + " reachables");
+    }
+
     public void populateNatives(String path) throws Exception {
         //Populate a HashSet to hold all native inchis
         Set<String> nativeInchis = new HashSet<>();
@@ -168,6 +209,7 @@ public class Synthesizer {
 
         System.out.println("done populating natives: " + path + ", have: " + chemicalToShell.size() + " reachables");
     }
+
 
     /**
      * One round of wavefront expansion. It iterates through all the reactions
@@ -247,7 +289,7 @@ public class Synthesizer {
         for (Reaction rxn : reactionToShell.keySet()) {
             for (Chemical apdt : rxn.getProducts()) {
 
-                //Do not index reactions for natives because no additional 
+                //Do not index reactions for natives because no additional
                 //reactions are neded to make them
                 Integer shell = chemicalToShell.get(apdt);
                 if (shell == 0) {
@@ -287,9 +329,9 @@ public class Synthesizer {
      * @return
      */
     private StringBuilder printoutCascadeRelay(Chemical achem,
-            StringBuilder sb,
-            int indents,
-            Set<Chemical> visited) {
+                                               StringBuilder sb,
+                                               int indents,
+                                               Set<Chemical> visited) {
         visited.add(achem);
 
         //Put in a line of id, inchi, name into the stringbuilder for this chem
@@ -333,28 +375,35 @@ public class Synthesizer {
 
         //Populate the chemical and reaction data
         synth.populateChemicals("good_chems.txt");
-        synth.populateReactions("good_reactions.txt");
+        //synth.populateReactions("good_reactions.txt");
+        //synth.populateChemicals("Ecoli_chemicals.txt");
+        synth.populateReactions("Ecoli_rxns.txt");
 
         //To use non-inchi-validated version of MetaCyc, run these instead
 //        synth.populateChemicals("metacyc_chemicals.txt");
 //        synth.populateReactions("metacyc_reactions.txt");
         //Populate the bag of chemicals to consider as shell 0 "natives"
+        //synth.populateChemFromHost("Ecoli_chemicals.txt");
         synth.populateNatives("minimal_metabolites.txt");
         synth.populateNatives("universal_metabolites.txt");
+        synth.populateHostNatives("Ecoli_chemicals.txt");
+        //synth.populateNatives("E. coli W.txt");
 
         //Expand until exhausted
         while (synth.ExpandOnce()) {}
 
         //Print out the reachables and their shell
-        synth.printReachables("metacyc_L2_reachables.txt");
+        //synth.printReachables("metacyc_L2_reachables.txt");
 
         //Calculate Cascades
         synth.calculateCascades();
 
         //Output cascade for butanol
-        Chemical butanol = synth.allChemicals.get(5133);
-        String cascade_output = synth.printoutCascade(butanol);
-        FileUtils.writeFile(cascade_output, "butanol_cascade.txt");
+        /**
+         Chemical butanol = synth.allChemicals.get(5133);
+         String cascade_output = synth.printoutCascade(butanol);
+         FileUtils.writeFile(cascade_output, "butanol_cascade.txt");
+         **/
 
         System.out.println("done");
     }

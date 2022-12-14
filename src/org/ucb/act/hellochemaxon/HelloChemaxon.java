@@ -32,7 +32,7 @@ public class HelloChemaxon {
             ChemAxonUtils.license();
         } catch (Exception err) {
             File licensedir = new File("chemaxon_license");
-            if(!licensedir.exists()) {
+            if (!licensedir.exists()) {
                 licensedir.mkdir();
             }
             System.out.println("You need to add the Chemaxon license file on your path. Put it in the newly-generated chemaxon_license directory.");

@@ -4,6 +4,7 @@ package org.ucb.act.synthesis.model;
  * Immutable Class for describing a Chemical
  * 
  * @author J. Christopher Anderson
+ *
  */
 public class Chemical {
     private final long id;
@@ -17,6 +18,7 @@ public class Chemical {
         this.smiles = smiles;
         this.name = name;
     }
+
 
     public long getId() {
         return id;
